@@ -4,17 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pro To-Do App</title>
-    <link rel="icon" type="image/png" href="logo.png"/>
+          <link rel="icon" type="image/png" href="logo.png"/>
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emoji-picker-element@1.12.0/style.css">
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QKPK99RGZW"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-QKPK99RGZW');
-    </script>
+
+
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QKPK99RGZW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-QKPK99RGZW');
+</script>
+    
     <style>
         :root {
             --light-bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -594,16 +599,12 @@
                 <i class="fas fa-moon"></i>
             </button>
         </div>
-        <div class="gamification-container">
-            <i class="fas fa-trophy"></i>
-            <span id="points-display">Points: 0</span>
-        </div>
-        
+
         <div class="view-toggler">
             <button id="list-view-btn" class="active"><i class="fas fa-list"></i> List</button>
             <button id="kanban-view-btn"><i class="fas fa-columns"></i> Kanban</button>
         </div>
-        
+
         <div class="search-filter-container">
             <input type="text" id="search-input" placeholder="Search tasks...">
             <select id="filter-select">
@@ -612,7 +613,7 @@
                 <option value="completed">Completed</option>
             </select>
         </div>
-    
+
         <div class="input-container">
             <input type="text" id="task-input" placeholder="Add a new task...">
             <div class="task-options">
@@ -636,7 +637,7 @@
         <div id="task-list-view">
             <ul id="task-list"></ul>
         </div>
-        
+
         <div id="kanban-view">
             <div class="kanban-board">
                 <div class="kanban-column" data-status="to-do">
@@ -650,7 +651,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="progress-container">
             <span id="progress-text">Daily Progress: 0/5 (0%)</span>
             <div class="progress-bar">
@@ -663,18 +664,17 @@
             <label for="daily-goal-input">Daily Goal:</label>
             <input type="number" id="daily-goal-input" value="5" min="1">
         </div>
-        
+
         <div class="background-selector">
             <input type="url" id="bg-url-input" placeholder="Paste image URL here">
             <button id="set-bg-btn">Set Background</button>
         </div>
-        
+
         <div class="motivational-quote" id="motivational-quote"></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@1.12.0/index.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const taskInput = document.getElementById('task-input');
@@ -697,7 +697,6 @@
             const motivationalQuoteEl = document.getElementById('motivational-quote');
             const bgUrlInput = document.getElementById('bg-url-input');
             const setBgBtn = document.getElementById('set-bg-btn');
-            const pointsDisplay = document.getElementById('points-display');
 
             const QUOTES = [
                 "The secret of getting ahead is getting started. - Mark Twain",
@@ -710,18 +709,12 @@
             let allTasks = [];
             let currentView = 'list';
             let dailyGoal = parseInt(dailyGoalInput.value) || 5;
-            let userPoints = 0;
-
-            if ('Notification' in window) {
-                Notification.requestPermission();
-            }
 
             loadTasks();
             loadTheme();
             loadBackground();
             displayRandomQuote();
             setupKanbanDragAndDrop();
-            updatePointsDisplay();
 
             addTaskBtn.addEventListener('click', addTask);
             taskInput.addEventListener('keypress', (e) => {
@@ -747,14 +740,6 @@
                     bgUrlInput.value = '';
                 }
             });
-            
-            document.addEventListener('click', (e) => {
-                document.querySelectorAll('.emoji-picker-container').forEach(picker => {
-                    if (!picker.contains(e.target) && !e.target.closest('.emoji-button')) {
-                        picker.classList.remove('visible');
-                    }
-                });
-            });
 
             function addTask() {
                 const taskText = taskInput.value.trim();
@@ -768,9 +753,7 @@
                         completed: false,
                         status: 'to-do',
                         pinned: false,
-                        completionDate: null,
-                        emoji: '',
-                        points: getPointsForPriority(taskPriority.value) 
+                        completionDate: null
                     };
                     allTasks.push(task);
                     saveTasks();
@@ -805,24 +788,19 @@
                 li.innerHTML = `
                     <div class="task-main-content">
                         <div class="task-details">
-                            <span class="task-text">
-                                <span class="task-emoji">${task.emoji}</span>${task.text}
-                            </span>
+                            <span class="task-text">${task.text}</span>
                             <div class="task-meta">
                                 <span class="priority-label">${priorityLabel}</span>
                                 <span class="category-label"><i class="fas fa-tag"></i> ${task.category.charAt(0).toUpperCase() + task.category.slice(1)}</span>
                                 ${dueDateHTML}
-                                ${task.reminder ? `<span class="reminder-label"><i class="fas fa-bell"></i> ${new Date(task.reminder).toLocaleString()}</span>` : ''}
                             </div>
                         </div>
                         <div class="task-actions">
-                            <button class="pin-btn ${task.pinned ? 'pinned' : ''}"><i class="fas fa-thumbtack"></i></button>
-                            <button class="edit-btn"><i class="fas fa-edit"></i></button>
+                            <button class="pin-btn ${task.pinned ? 'pinned' : ''}">
+                                <i class="fas fa-thumbtack"></i>
+                            </button>
                             <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
                         </div>
-                    </div>
-                    <div class="reminder-container" style="display: none;">
-                        <input type="datetime-local" class="reminder-input" value="${task.reminder || ''}">
                     </div>
                 `;
                 return li;
@@ -831,172 +809,108 @@
             function handleTaskActions(e) {
                 const li = e.target.closest('.task-item');
                 if (!li) return;
-                const taskId = li.getAttribute('data-id');
-                const taskIndex = allTasks.findIndex(task => task.id == taskId);
-                if (taskIndex === -1) return;
+                const taskId = parseInt(li.getAttribute('data-id'));
+                const task = allTasks.find(t => t.id === taskId);
+                if (!task) return;
 
                 if (e.target.closest('.delete-btn')) {
-                    deleteTask(li, taskIndex);
-                } else if (e.target.closest('.edit-btn')) {
-                    editTask(li, taskIndex);
+                    li.classList.add('removed');
+                    li.addEventListener('animationend', () => {
+                        allTasks = allTasks.filter(t => t.id !== taskId);
+                        saveTasks();
+                        renderTasks();
+                    });
                 } else if (e.target.closest('.pin-btn')) {
-                    togglePinTask(taskIndex);
-                } else {
-                    toggleTaskCompletion(taskIndex);
-                }
-            }
-
-            function deleteTask(li, index) {
-                li.classList.add('removed');
-                li.addEventListener('animationend', () => {
-                    allTasks.splice(index, 1);
+                    task.pinned = !task.pinned;
                     saveTasks();
                     renderTasks();
-                });
-            }
-
-            function editTask(li, index) {
-                const task = allTasks[index];
-                const newText = prompt("Edit your task:", task.text);
-                if (newText !== null && newText.trim() !== '') {
-                    task.text = newText.trim();
-                    saveTasks();
-                    renderTasks();
-                }
-            }
-
-            function togglePinTask(index) {
-                allTasks[index].pinned = !allTasks[index].pinned;
-                saveTasks();
-                renderTasks();
-            }
-
-            function toggleTaskCompletion(index) {
-                const task = allTasks[index];
-                task.completed = !task.completed;
-                if (task.completed) {
-                    task.completionDate = new Date().toISOString().split('T')[0];
-                    if (task.status !== 'done') {
-                        task.status = 'done';
-                    }
-                    userPoints += task.points;
-                    showConfetti();
-                    if (Notification.permission === 'granted') {
-                        new Notification('Task Completed!', {
-                            body: `You completed "${task.text}". Way to go!`,
-                            icon: 'logo.png'
-                        });
-                    }
-                } else {
-                    task.completionDate = null;
-                    if (task.status === 'done') {
+                } else if (e.target.closest('.task-main-content')) {
+                    if (task.completed) {
+                        task.completed = false;
                         task.status = 'to-do';
+                        task.completionDate = null;
+                    } else {
+                        task.completed = true;
+                        task.status = 'done';
+                        task.completionDate = new Date().toISOString();
                     }
-                    userPoints = Math.max(0, userPoints - task.points);
+                    saveTasks();
+                    renderTasks();
                 }
-                updatePointsDisplay();
-                saveTasks();
-                renderTasks();
+            }
+
+            function renderTasks() {
+                const filteredTasks = filterAndSortTasks();
+                
+                taskList.innerHTML = '';
+                const kanbanColumns = document.querySelectorAll('.kanban-column');
+                kanbanColumns.forEach(col => {
+                    col.innerHTML = `<h3>${col.getAttribute('data-status').replace('-', ' ').toUpperCase()}</h3>`;
+                });
+
+                filteredTasks.forEach(task => {
+                    const element = createTaskElement(task);
+                    if (currentView === 'list') {
+                        taskList.appendChild(element);
+                    } else {
+                        const kanbanElement = element.cloneNode(true);
+                        kanbanElement.classList.remove('task-item');
+                        kanbanElement.classList.add('kanban-task');
+                        document.querySelector(`.kanban-column[data-status="${task.status}"]`).appendChild(kanbanElement);
+                    }
+                });
+                updateProgress();
+            }
+
+            function filterAndSortTasks() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const filter = filterSelect.value;
+                
+                const filtered = allTasks.filter(task => {
+                    const matchesSearch = task.text.toLowerCase().includes(searchTerm);
+                    const matchesFilter = filter === 'all' || 
+                                         (filter === 'pending' && !task.completed) || 
+                                         (filter === 'completed' && task.completed);
+                    return matchesSearch && matchesFilter;
+                });
+                const priorityOrder = { 'high': 3, 'medium': 2, 'low': 1 };
+                return filtered.sort((a, b) => {
+                    if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+                    const aCompleted = a.completed;
+                    const bCompleted = b.completed;
+                    if (aCompleted !== bCompleted) return aCompleted ? 1 : -1;
+                    const aPriority = priorityOrder[a.priority];
+                    const bPriority = priorityOrder[b.priority];
+                    return bPriority - aPriority;
+                });
             }
 
             function saveTasks() {
                 localStorage.setItem('tasks', JSON.stringify(allTasks));
-                updateProgress();
             }
 
             function loadTasks() {
-                const savedTasks = localStorage.getItem('tasks');
-                if (savedTasks) {
-                    allTasks = JSON.parse(savedTasks);
-                }
-                const savedPoints = localStorage.getItem('userPoints');
-                if (savedPoints) {
-                    userPoints = parseInt(savedPoints);
-                }
-                const savedDailyGoal = localStorage.getItem('dailyGoal');
-                if (savedDailyGoal) {
-                    dailyGoal = parseInt(savedDailyGoal);
-                    dailyGoalInput.value = dailyGoal;
-                }
-                renderTasks();
-            }
-
-            function renderTasks() {
-                if (currentView === 'list') {
-                    renderListView();
-                } else {
-                    renderKanbanView();
-                }
-                updateProgress();
-            }
-
-            function renderListView() {
-                taskList.innerHTML = '';
-                const searchTerm = searchInput.value.toLowerCase();
-                const filter = filterSelect.value;
-
-                let filteredTasks = allTasks.filter(task => {
-                    const matchesSearch = task.text.toLowerCase().includes(searchTerm);
-                    const matchesFilter = filter === 'all' || 
-                                         (filter === 'completed' && task.completed) ||
-                                         (filter === 'pending' && !task.completed);
-                    return matchesSearch && matchesFilter;
-                });
-                
-                filteredTasks.sort((a, b) => {
-                    if (a.pinned && !b.pinned) return -1;
-                    if (!a.pinned && b.pinned) return 1;
-                    return new Date(a.duedate) - new Date(b.duedate);
-                });
-
-                filteredTasks.forEach(task => {
-                    taskList.appendChild(createTaskElement(task));
-                });
-            }
-
-            function renderKanbanView() {
-                const kanbanColumns = document.querySelectorAll('.kanban-column');
-                kanbanColumns.forEach(column => column.innerHTML = `<h3>${column.getAttribute('data-status').replace('-', ' ')}</h3>`);
-                
-                allTasks.forEach(task => {
-                    const column = document.querySelector(`.kanban-column[data-status="${task.status}"]`);
-                    if (column) {
-                        const taskElement = createTaskElement(task);
-                        taskElement.classList.add('kanban-task');
-                        column.appendChild(taskElement);
-                    }
-                });
-            }
-
-            function updateProgress() {
-                const today = new Date().toISOString().split('T')[0];
-                const completedToday = allTasks.filter(task => task.completed && task.completionDate === today).length;
-                
-                const percentage = Math.min(100, (completedToday / dailyGoal) * 100);
-                progressFill.style.width = `${percentage}%`;
-                progressText.textContent = `Daily Progress: ${completedToday}/${dailyGoal} (${Math.round(percentage)}%)`;
-
-                if (completedToday >= dailyGoal) {
-                    greatJobMessage.style.display = 'block';
-                } else {
-                    greatJobMessage.style.display = 'none';
+                const storedTasks = localStorage.getItem('tasks');
+                if (storedTasks) {
+                    allTasks = JSON.parse(storedTasks);
+                    renderTasks();
                 }
             }
-            
-            function showConfetti() {
-                confetti({
-                    particleCount: 100,
-                    spread: 70,
-                    origin: { y: 0.6 }
-                });
+
+            function getPriorityLabel(priority) {
+                switch (priority) {
+                    case 'high': return '🔴 High Priority';
+                    case 'medium': return '🟡 Medium Priority';
+                    case 'low': return '🟢 Low Priority';
+                    default: return '';
+                }
             }
 
             function toggleTheme() {
                 document.body.classList.toggle('dark-mode');
                 const isDarkMode = document.body.classList.contains('dark-mode');
                 localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-                const icon = themeSwitcher.querySelector('i');
-                icon.className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
+                themeSwitcher.querySelector('i').className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
             }
 
             function loadTheme() {
@@ -1007,41 +921,6 @@
                 }
             }
 
-            function loadBackground() {
-                const savedBg = localStorage.getItem('background-image');
-                if (savedBg) {
-                    document.body.style.backgroundImage = `url('${savedBg}')`;
-                }
-            }
-
-            function getPriorityLabel(priority) {
-                switch(priority) {
-                    case 'high': return '🔴 High';
-                    case 'medium': return '🟡 Medium';
-                    case 'low': return '🟢 Low';
-                    default: return '';
-                }
-            }
-
-            function getPointsForPriority(priority) {
-                switch(priority) {
-                    case 'high': return 50;
-                    case 'medium': return 30;
-                    case 'low': return 10;
-                    default: return 10;
-                }
-            }
-
-            function updatePointsDisplay() {
-                pointsDisplay.textContent = `Points: ${userPoints}`;
-                localStorage.setItem('userPoints', userPoints);
-            }
-
-            function displayRandomQuote() {
-                const randomQuote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
-                motivationalQuoteEl.textContent = randomQuote;
-            }
-
             function switchView(view) {
                 currentView = view;
                 if (view === 'list') {
@@ -1049,46 +928,66 @@
                     kanbanView.style.display = 'none';
                     listViewBtn.classList.add('active');
                     kanbanViewBtn.classList.remove('active');
-                    renderListView();
                 } else {
                     taskListView.style.display = 'none';
                     kanbanView.style.display = 'flex';
-                    kanbanViewBtn.classList.add('active');
                     listViewBtn.classList.remove('active');
-                    renderKanbanView();
+                    kanbanViewBtn.classList.add('active');
                 }
+                renderTasks();
+            }
+
+            function updateProgress() {
+                const today = new Date().toISOString().slice(0, 10);
+                const completedToday = allTasks.filter(task => {
+                    return task.completed && task.completionDate && task.completionDate.slice(0, 10) === today;
+                }).length;
+                
+                const percentage = Math.round((completedToday / dailyGoal) * 100);
+                progressFill.style.width = `${Math.min(100, percentage)}%`;
+                progressText.textContent = `Daily Progress: ${completedToday}/${dailyGoal} (${percentage}%)`;
+
+                if (completedToday >= dailyGoal && dailyGoal > 0) {
+                    greatJobMessage.style.display = 'block';
+                    triggerConfetti();
+                } else {
+                    greatJobMessage.style.display = 'none';
+                }
+            }
+
+            function triggerConfetti() {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }
+
+            function displayRandomQuote() {
+                const randomIndex = Math.floor(Math.random() * QUOTES.length);
+                motivationalQuoteEl.textContent = QUOTES[randomIndex];
             }
             
             function setupKanbanDragAndDrop() {
-                const kanbanColumns = document.querySelectorAll('.kanban-column');
-                kanbanColumns.forEach(column => {
-                    new Sortable(column, {
-                        group: 'kanban-tasks',
+                const kanbanBoards = document.querySelectorAll('.kanban-column');
+                kanbanBoards.forEach(board => {
+                    new Sortable(board, {
+                        group: 'kanban',
                         animation: 150,
-                        onEnd: function (evt) {
+                        onEnd: function(evt) {
+                            const taskId = parseInt(evt.item.getAttribute('data-id'));
                             const newStatus = evt.to.getAttribute('data-status');
-                            const taskId = evt.item.getAttribute('data-id');
-                            const task = allTasks.find(t => t.id == taskId);
-
+                            
+                            const task = allTasks.find(t => t.id === taskId);
                             if (task) {
                                 task.status = newStatus;
                                 if (newStatus === 'done') {
                                     task.completed = true;
-                                    task.completionDate = new Date().toISOString().split('T')[0];
-                                    userPoints += task.points;
-                                    showConfetti();
-                                    if (Notification.permission === 'granted') {
-                                        new Notification('Task Completed!', {
-                                            body: `You completed "${task.text}" via Kanban!`,
-                                            icon: 'logo.png'
-                                        });
-                                    }
+                                    task.completionDate = new Date().toISOString();
                                 } else {
                                     task.completed = false;
                                     task.completionDate = null;
-                                    userPoints = Math.max(0, userPoints - task.points);
                                 }
-                                updatePointsDisplay();
                                 saveTasks();
                                 renderTasks();
                             }
@@ -1096,7 +995,16 @@
                     });
                 });
             }
+            
+            function loadBackground() {
+                const savedBg = localStorage.getItem('background-image');
+                if (savedBg) {
+                    document.body.style.backgroundImage = `url('${savedBg}')`;
+                }
+            }
         });
     </script>
 </body>
+
 </html>
+
